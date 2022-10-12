@@ -10,7 +10,7 @@ OBJECTS =
 
 all: run
 
-main: main.o $(OBJECTS)
+main: main.o $(OBJECTS) image.h types.h vec3.h
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS) $(IFLAGS)
 
 run: main
