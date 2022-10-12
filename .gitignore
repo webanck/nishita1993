@@ -1,0 +1,7 @@
+*.ppm
+*.png
+
+*.swp
+
+*.o
+main
