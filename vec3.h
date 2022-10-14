@@ -11,4 +11,15 @@ public:
 	double x() const { return mCoords[0]; }
 	double y() const { return mCoords[1]; }
 	double z() const { return mCoords[2]; }
+
+	//todo: missing operators
+	friend double dot(const Vec3& a, const Vec3& b);
+
+	double squaredLength() const { return (mCoords*mCoords).sum(); }
+	double length() const { return std::sqrt(squaredLength()); }
 };
+
+double dot(const Vec3& a, const Vec3& b)
+{
+	return (a.mCoords * b.mCoords).sum();
+}
