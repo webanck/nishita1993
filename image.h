@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -45,6 +46,15 @@ struct Image
 		file.open(path);
 		writePPM(file);
 		file.close();
+	}
+
+	double getAspectRatio() const { return static_cast<double>(mWidth)/mHeight; }
+
+	void computeFromFunction(const std::function<tColor(const uint, const uint)>& fun)
+	{
+		for(uint col = 0u; col < mWidth; col++)
+		for(uint row = 0u; row < mHeight; row++)
+			operator()(col, row) = fun(col, row);
 	}
 
 	static void test()

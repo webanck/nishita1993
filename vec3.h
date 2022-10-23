@@ -21,7 +21,16 @@ public:
 	Vec3 operator+(const Vec3& b) const { return Vec3(mCoords + b.mCoords); }
 	Vec3 operator-(const Vec3& b) const { return Vec3(mCoords - b.mCoords); }
 	friend Vec3 operator*(const double s, const Vec3& v);
+
 	friend double dot(const Vec3& a, const Vec3& b);
+	friend Vec3 cross(const Vec3& a, const Vec3& b);
+
+	Vec3 normalized() const
+	{
+		const double l = length();
+		assert(l > 0.0001);
+		return (1./l) * *this;
+	}
 
 	double squaredLength() const { return (mCoords*mCoords).sum(); }
 	double length() const { return std::sqrt(squaredLength()); }
@@ -34,6 +43,10 @@ Vec3 operator*(const double s, const Vec3& v)
 double dot(const Vec3& a, const Vec3& b)
 {
 	return (a.mCoords * b.mCoords).sum();
+}
+Vec3 cross(const Vec3& a, const Vec3& b)
+{
+	return Vec3(a.mCoords.cshift(1)*b.mCoords.cshift(2) - a.mCoords.cshift(2)*b.mCoords.cshift(1));
 }
 
 #endif
