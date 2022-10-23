@@ -1,5 +1,10 @@
+#ifndef SPHERE
+#define SPHERE
+
 #include <optional>
 
+#include "image.h"
+#include "ray.h"
 #include "vec3.h"
 
 struct Sphere
@@ -7,15 +12,15 @@ struct Sphere
 	double mRadius;
 	Vec3 mCenter;
 
-	std::optional<Vec3> intersection(const Ray& ray, const double tMin, const double tMax)
+	std::optional<double> intersection(const Ray& ray, const double tMin, const double tMax)
 	{
 		assert(tMin <= tMax);
 
-		using tReturn = std::optional<Vec3>;
+		using tReturn = std::optional<double>;
 
 		const Vec3 centerToOrigin = mCenter - ray.mOrigin;
 		const double a = 1.;
-		const double b = 2.*dot(centerToOrigin, ray.mDirection());
+		const double b = 2.*dot(centerToOrigin, ray.mDirection);
 		const double c = centerToOrigin.squaredLength() - mRadius*mRadius;
 		const double delta = b*b - 4.*a*c;
 
@@ -29,8 +34,15 @@ struct Sphere
 
 		const double depths[2] = {std::min(ta, tb), std::max(ta, tb)};
 		if(depths[1] < tMin || depths[0] > tMax)
-			return tReturn;
+			return tReturn();
 
 		return tReturn(depths[0] > tMin ? depths[0] : depths[1]);
 	}
-}
+
+	static void test()
+	{
+		Image image(256, 256);
+	}
+};
+
+#endif

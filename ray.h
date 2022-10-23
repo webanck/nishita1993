@@ -1,3 +1,6 @@
+#ifndef RAY
+#define RAY
+
 #include <cassert>
 
 #include "vec3.h"
@@ -8,8 +11,10 @@ struct Ray
 	{
 		assert(std::abs(mDirection.squaredLength() - 1.) < 0.001);
 	}
-	Vec3 operator(const double t) { return mOrigin + t * mDirection; }
+	Vec3 operator()(const double t) { return mOrigin + t * mDirection; }
 
 	Vec3 mOrigin;
 	Vec3 mDirection;
 };
+
+#endif

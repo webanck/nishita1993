@@ -6,17 +6,15 @@ IFLAGS =
 LFLAGS = -lm
 
 
-OBJECTS =
-
 all: run
 
-main: main.o $(OBJECTS) image.h types.h vec3.h
+main: main.cpp image.h sphere.h types.h vec3.h
 	$(CC) $(CFLAGS) -o $@ $^ $(LFLAGS) $(IFLAGS)
 
 run: main
 	./main
 
 clean:
-	rm -rf $(PROGRAMS) *.o *.d *.json
+	rm -rf $(PROGRAMS) *.o
 
 .PHONY: all run clean

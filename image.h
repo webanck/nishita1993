@@ -1,3 +1,6 @@
+#ifndef IMAGE
+#define IMAGE
+
 #include <cassert>
 #include <fstream>
 #include <iostream>
@@ -44,6 +47,11 @@ struct Image
 		file.close();
 	}
 
+	static void test()
+	{
+		Image(256, 256).saveAsPPM("black_256x256.ppm");
+	}
+
 private:
 	static void writeColorPPM(std::ostream& out, const tColor& color)
 	{
@@ -70,3 +78,5 @@ private:
 			writeColorPPM(out, operator()(col, row));
 	}
 };
+
+#endif
