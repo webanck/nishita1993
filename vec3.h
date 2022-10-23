@@ -36,15 +36,15 @@ public:
 	double length() const { return std::sqrt(squaredLength()); }
 };
 
-Vec3 operator*(const double s, const Vec3& v)
+inline Vec3 operator*(const double s, const Vec3& v)
 {
 	return Vec3(s * v.mCoords);
 }
-double dot(const Vec3& a, const Vec3& b)
+inline double dot(const Vec3& a, const Vec3& b)
 {
 	return (a.mCoords * b.mCoords).sum();
 }
-Vec3 cross(const Vec3& a, const Vec3& b)
+inline Vec3 cross(const Vec3& a, const Vec3& b)
 {
 	return Vec3(a.mCoords.cshift(1)*b.mCoords.cshift(2) - a.mCoords.cshift(2)*b.mCoords.cshift(1));
 }

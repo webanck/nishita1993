@@ -10,7 +10,8 @@
 - Ray-sphere intersection implementation (to test for compilation and correctness).
 
 # 23/10/2022
-15h30-15h45, 16h-18h, 22h30-23h15
+15h30-15h45, 16h-18h, 22h30-23h30
 
 - Compilation and makefile fixes.
 - Pinhole camera and ray tracing for ray-sphere intersection depth testing.
+- Separated compilation with automated headers dependency.
