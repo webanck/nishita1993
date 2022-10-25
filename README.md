@@ -15,3 +15,9 @@
 - Compilation and makefile fixes.
 - Pinhole camera and ray tracing for ray-sphere intersection depth testing.
 - Separated compilation with automated headers dependency.
+
+# 25/10/2022
+7h-9h
+
+- Multiple ray-sphere intersections.
+- Beginning of the atmospheric single scattering implementation.

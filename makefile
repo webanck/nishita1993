@@ -9,7 +9,7 @@ LFLAGS = -lm
 all: run
 
 PROGRAMS = main
-OBJECTS = sphere.o
+OBJECTS = atmosphere.o sphere.o
 
 # Auto dependencies (see https://skandhurkat.com/post/makefile-dependencies/)
 %.d: %.cpp
