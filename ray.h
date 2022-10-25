@@ -12,7 +12,7 @@ struct Ray
 
 	Ray(const Vec3& origin, const Vec3& direction) : mOrigin(origin), mDirection(direction)
 	{
-		assert(std::abs(mDirection.squaredLength() - 1.) < 0.001);
+		assert(abs(mDirection.squaredLength() - 1.) < 0.001);
 	}
 	Vec3 operator()(const double t) const { return mOrigin + t * mDirection; }
 };
