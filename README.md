@@ -21,3 +21,8 @@
 
 - Multiple ray-sphere intersections.
 - Beginning of the atmospheric single scattering implementation.
+
+# 27/10/2022
+22h-23h30
+
+- Coarse single scattering test case.

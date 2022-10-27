@@ -32,8 +32,8 @@ Sphere::tOptDepths Sphere::intersectionDepths(const Ray& ray, const double tMin,
 		return result;
 
 	if(depths[0] >= tMin && depths[1] <= tMax)
-	{
-		result[0].emplace(depths[0]);
+{
+	result[0].emplace(depths[0]);
 		result[1].emplace(depths[1]);
 	}
 	else
@@ -68,7 +68,7 @@ void Sphere::test()
 				(row + 0.5)/image.mHeight
 			);
 
-			const std::optional<double> depth = sphere.intersectionDepth(r, closestSphereDepth - 0.01, focusDistance);
+			const tOptDepth depth = sphere.intersectionDepth(r, closestSphereDepth - 0.01, focusDistance);
 
 			//Depth.
 			const double v = depth ? abs((*depth - closestSphereDepth) * normalisationFactor) : 0.;

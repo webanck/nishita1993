@@ -2,6 +2,7 @@
 #define VEC3
 
 #include <cassert>
+#include <ostream>
 #include <valarray>
 
 class Vec3
@@ -20,7 +21,13 @@ public:
 	//todo: missing operators
 	Vec3 operator+(const Vec3& b) const { return Vec3(mCoords + b.mCoords); }
 	Vec3 operator-(const Vec3& b) const { return Vec3(mCoords - b.mCoords); }
+	Vec3 operator-() const { return Vec3(-mCoords); }
+	Vec3 operator*(const Vec3& b) const { return Vec3(mCoords * b.mCoords); }
 	friend Vec3 operator*(const double s, const Vec3& v);
+
+	void operator+=(const Vec3& v) { operator=(operator+(v)); }
+
+	friend Vec3 exp(const Vec3& v);
 
 	friend double dot(const Vec3& a, const Vec3& b);
 	friend Vec3 cross(const Vec3& a, const Vec3& b);
@@ -40,6 +47,10 @@ inline Vec3 operator*(const double s, const Vec3& v)
 {
 	return Vec3(s * v.mCoords);
 }
+inline Vec3 exp(const Vec3& v)
+{
+	return Vec3(exp(v.mCoords));
+}
 inline double dot(const Vec3& a, const Vec3& b)
 {
 	return (a.mCoords * b.mCoords).sum();
@@ -47,6 +58,11 @@ inline double dot(const Vec3& a, const Vec3& b)
 inline Vec3 cross(const Vec3& a, const Vec3& b)
 {
 	return Vec3(a.mCoords.cshift(1)*b.mCoords.cshift(2) - a.mCoords.cshift(2)*b.mCoords.cshift(1));
+}
+
+inline std::ostream& operator<<(std::ostream& out, const Vec3& v)
+{
+	return out << v.x() << ' ' << v.y() << ' ' << v.z();
 }
 
 #endif
