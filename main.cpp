@@ -7,8 +7,8 @@
 int main(int argc, char** argv)
 {
 	//Image::test();
-	Sphere::test();
-	//Atmosphere::test();
+	//Sphere::test();
+	Atmosphere::test();
 
 	return 0;
 }

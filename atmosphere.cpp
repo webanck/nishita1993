@@ -2,11 +2,11 @@
 
 #include "camera.h"
 #include "image.h"
-#include "ray.h"
 #include "sphere.h"
 
-const Vec3 Atmosphere::mAttenuationAirRGB = 10.e-6 * Vec3(3.8, 13.5, 33.1);
-const Vec3 Atmosphere::mSunLightIntensityRGB = 0.01 * Vec3(1, 1, 1);
+const Vec3 Atmosphere::mAttenuationAirRGB = 1.e-6 * Vec3(3.8, 13.5, 33.1);
+const Vec3 Atmosphere::mSunLightIntensityRGB = 10./255.*Vec3(255, 240, 233); //RGB approximation of 5800 Kelvin degrees light
+const Vec3 Atmosphere::mSunLightDirection = -Vec3(1.).normalized();
 
 //Ray is expressed in the Earth centered referential.
 Vec3 Atmosphere::singleScatteredLight(const Ray& incidentRay)
@@ -14,64 +14,115 @@ Vec3 Atmosphere::singleScatteredLight(const Ray& incidentRay)
 	assert(incidentRay.mOrigin.squaredLength() > sqr(mInnerRadius));
 	assert(incidentRay.mOrigin.squaredLength() > sqr(mOuterRadius)); //not mandatory but this fits the "viewed from space" case
 
-	Vec3 light(0, 0, 0);
+	Vec3 light(0.);
 
-	const Sphere::tOptDepths outerOptDepths = Sphere(mOuterRadius, Vec3(0, 0, 0)).intersectionDepths(incidentRay);
+	const Sphere::tOptDepths outerOptDepths = Sphere(mOuterRadius, Vec3(0.)).intersectionDepths(incidentRay);
 	if(!outerOptDepths[0]) return light;
 
 	const double tMin = *(outerOptDepths[0]);
 	assert(outerOptDepths[1]);
 
-	const Sphere::tOptDepth innerOptDepth = Sphere(mInnerRadius, Vec3(0, 0, 0)).intersectionDepth(incidentRay);
+	const Sphere::tOptDepth innerOptDepth = Sphere(mInnerRadius, Vec3(0.)).intersectionDepth(incidentRay);
 	const double tMax = innerOptDepth ? *innerOptDepth : *(outerOptDepths[1]);
 	const double middleAltitude = getAltitude(incidentRay(0.5*(tMin + tMax)));
-	std::cerr << "tMinAltitude: " << getAltitude(incidentRay(tMin)) << std::endl;
-	std::cerr << "tMaxAltitude: " << getAltitude(incidentRay(tMax)) << std::endl;
-	std::cerr << "middleAltitude: " << middleAltitude << std::endl;
 	assert(middleAltitude >= 0. && middleAltitude <= mOuterRadius - mInnerRadius);
+
+	const double scatteringAngleCos = -dot(incidentRay.mDirection, mSunLightDirection);
+	const double airPhase = rayleighPhase(scatteringAngleCos);
+	const double aerosolsPhase = cornettePhase(scatteringAngleCos);
 
 	//Coarse ray marching
 	{
 		const double l = tMax - tMin;
+		assert(l > 0.);
 		const uint iMax = 10u;
 		const double stepSize = l/iMax;
+		//const double stepSize = 10000;
+		//const uint iMax = l/stepSize;
 
 		Vec3 opticalDepth(0, 0, 0);
 		for(uint i = 0u; i < iMax; i++)
 		{
-			const double t = tMin + i*stepSize;
+			const double t = tMin + (i + 0.5)*stepSize;
 			const Vec3 p = incidentRay(t);
 
 			const double h = getAltitude(p);
-			std::cerr << "altitude: " << h << std::endl;
+			//std::cerr << "altitude: " << h << std::endl;
 			assert(h >= 0. && h < mOuterRadius - mInnerRadius);
+			//static uint counter = 0u;
+			//if(!(h >= 0. && h < mOuterRadius - mInnerRadius))
+			//{
+			//	std::cerr << counter++ << ":" << std::endl;
+			//	std::cerr << "\ttsurface intersection: " << (innerOptDepth ? "yes" : "no") << std::endl;
+			//	std::cerr << "\ttMinAltitude: " << getAltitude(incidentRay(tMin)) << std::endl;
+			//	std::cerr << "\ttMaxAltitude: " << getAltitude(incidentRay(tMax)) << std::endl;
+			//	std::cerr << "\tmiddleAltitude: " << middleAltitude << std::endl;
+			//	std::cerr << "\taltitude: " << h << std::endl;
+			//}
 			const double airDensity = getAirDensity(h);
-			std::cerr << "airDensity: " << airDensity << std::endl;
-			//const double aerosolsDensity = getAerosolsDensity(h);
+			assert(airDensity > 0.);
+			const double aerosolsDensity = getAerosolsDensity(h);
+			assert(aerosolsDensity > 0.);
 
-			opticalDepth += stepSize * (airDensity * mAttenuationAirRGB /*+aerosolsDensity * mAttenuationAerosols*/);
+			opticalDepth += stepSize * (airDensity * mAttenuationAirRGB + aerosolsDensity * mAttenuationAerosols);
 
-			const Vec3 primaryTransmittance = exp(-opticalDepth);
-			const Vec3 secondaryTransmittance = Vec3(1, 1, 1);//getSunTransmittance(h, );
-			std::cerr << "transmittance: " << (primaryTransmittance * secondaryTransmittance).x() << std::endl;
+			if(isInEarthShadow(p)) continue;
 
-			light += stepSize * primaryTransmittance * secondaryTransmittance * mSunLightIntensityRGB;
+			const Vec3 transmittance = exp(-(opticalDepth + getSunOpticalDepth(p)));
+			const Vec3 airScattering = airPhase * airDensity * mAlbedoAir * mAttenuationAirRGB;
+			const double aerosolsScattering = aerosolsPhase * aerosolsDensity * mAlbedoAerosols * mAttenuationAerosols;
+			light += stepSize * (airScattering + Vec3(aerosolsScattering)) * transmittance * mSunLightIntensityRGB;
 		}
 	}
 
 	return light;
 }
 
-Vec3 Atmosphere::getSunTransmittance(const double altitude, const double zenitalAngle)
+bool Atmosphere::isInEarthShadow(const Vec3& p)
 {
+	return Sphere(mInnerRadius, Vec3(0.)).intersectionDepth(getSunRay(p)).has_value();
+}
+Vec3 Atmosphere::getSunOpticalDepth(const Vec3& p)
+{
+	assert(p.squaredLength() > sqr(mInnerRadius));
+	assert(p.squaredLength() < sqr(mOuterRadius));
+
+	assert(!isInEarthShadow(p));
+
+	//const double zenithalAngle = -dot(p.normalized(), mSunLightDirection);
+
+	const Ray sunRay = getSunRay(p);
+	const Sphere::tOptDepth optMaxDepth = Sphere(mOuterRadius, Vec3(0.)).intersectionDepth(sunRay);
+	assert(optMaxDepth);
+
 	//Coarse ray marching
-	return Vec3(1, 1, 1);
+	const double l = *optMaxDepth;
+	const uint iMax = 10u;
+	const double stepSize = l/iMax;
+
+	double airDensitySum = 0.;
+	double aerosolsDensitySum = 0.;
+	for(uint i = 0u; i < iMax; i++)
+	{
+		const double t = (i + 0.5)*stepSize;
+		const Vec3 p = sunRay(t);
+
+		const double h = getAltitude(p);
+		const double airDensity = getAirDensity(h);
+		assert(airDensity > 0.);
+		const double aerosolsDensity = getAerosolsDensity(h);
+		assert(aerosolsDensity > 0.);
+
+		airDensitySum += airDensity;
+		aerosolsDensitySum += aerosolsDensity;
+	}
+	return stepSize * (airDensitySum*mAttenuationAirRGB + Vec3(aerosolsDensitySum*mAttenuationAerosols));
 }
 
 
 void Atmosphere::test()
 {
-	const Sphere sphere(1., Vec3(0, 0, 0));
+	const Sphere sphere(1., Vec3(0.));
 
 	Image image(256, 256);
 

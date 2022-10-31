@@ -13,6 +13,7 @@ class Vec3
 public:
 	Vec3() : mCoords{0., 0., 0.} {}
 	Vec3(const double x, const double y, const double z) : mCoords{x, y, z} {}
+	Vec3(const double x) : mCoords{x, x, x} {}
 
 	double x() const { return mCoords[0]; }
 	double y() const { return mCoords[1]; }
