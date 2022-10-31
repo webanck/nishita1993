@@ -13,7 +13,7 @@ Sphere::tOptDepths Sphere::intersectionDepths(const Ray& ray, const double tMin,
 
 	tOptDepths result;
 
-	const Vec3 centerToOrigin = mCenter - ray.mOrigin;
+	const Vec3 centerToOrigin = ray.mOrigin - mCenter;
 	const double a = 1.;
 	const double b = 2.*dot(centerToOrigin, ray.mDirection);
 	const double c = centerToOrigin.squaredLength() - mRadius*mRadius;
@@ -32,8 +32,8 @@ Sphere::tOptDepths Sphere::intersectionDepths(const Ray& ray, const double tMin,
 		return result;
 
 	if(depths[0] >= tMin && depths[1] <= tMax)
-{
-	result[0].emplace(depths[0]);
+	{
+		result[0].emplace(depths[0]);
 		result[1].emplace(depths[1]);
 	}
 	else
@@ -68,6 +68,9 @@ void Sphere::test()
 				(row + 0.5)/image.mHeight
 			);
 
+			//std::cerr << "screen ray origin: " << r.mOrigin << std::endl;
+			//std::cerr << "screen ray direction: " << r.mDirection << std::endl;
+
 			const tOptDepth depth = sphere.intersectionDepth(r, closestSphereDepth - 0.01, focusDistance);
 
 			//Depth.
@@ -77,6 +80,9 @@ void Sphere::test()
 			//Normal.
 			//return depth ? 0.5*((r(*depth) - sphere.mCenter).normalized() + Vec3(1, 1, 1)) : Vec3(0, 0, 0);
 		};
+
+	//std::cerr << "tColor: " << sphereDepthFun(128, 128) << std::endl;
+
 
 	image.computeFromFunction(sphereDepthFun);
 	image.saveAsPPM("sphere_depth_test.ppm");

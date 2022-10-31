@@ -1,6 +1,8 @@
 #ifndef CAMERA
 #define CAMERA
 
+#include <cassert>
+
 #include "ray.h"
 #include "vec3.h"
 
@@ -26,6 +28,9 @@ public:
 		double focusDistance = 1.
 	) : mEye(eye)
 	{
+		assert(vfov > 0.);
+		assert(focusDistance > 0.);
+
 		const double viewportHeight = 2.*std::tan(0.5*vfov);
 		const double viewportWidth = aspectRatio * viewportHeight;
 
@@ -43,7 +48,7 @@ public:
 	Ray buildScreenRay(const double u, const double v) const
 	{
 		const Vec3 screenPoint = mLowerLeftCorner + u*mHorizontal + v*mVertical;
-		const Vec3 direction = (mEye - screenPoint).normalized(); //the screen is modeled as in front of the camera
+		const Vec3 direction = (screenPoint - mEye).normalized(); //the screen is modeled as in front of the camera
 		return Ray(mEye, direction);
 	}
 };
