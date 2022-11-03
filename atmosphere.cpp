@@ -37,8 +37,6 @@ Vec3 Atmosphere::singleScatteredLight(const Ray& incidentRay)
 		assert(l > 0.);
 		const uint iMax = 10u;
 		const double stepSize = l/iMax;
-		//const double stepSize = 10000;
-		//const uint iMax = l/stepSize;
 
 		Vec3 opticalDepth(0, 0, 0);
 		for(uint i = 0u; i < iMax; i++)
@@ -47,18 +45,7 @@ Vec3 Atmosphere::singleScatteredLight(const Ray& incidentRay)
 			const Vec3 p = incidentRay(t);
 
 			const double h = getAltitude(p);
-			//std::cerr << "altitude: " << h << std::endl;
 			assert(h >= 0. && h < mOuterRadius - mInnerRadius);
-			//static uint counter = 0u;
-			//if(!(h >= 0. && h < mOuterRadius - mInnerRadius))
-			//{
-			//	std::cerr << counter++ << ":" << std::endl;
-			//	std::cerr << "\ttsurface intersection: " << (innerOptDepth ? "yes" : "no") << std::endl;
-			//	std::cerr << "\ttMinAltitude: " << getAltitude(incidentRay(tMin)) << std::endl;
-			//	std::cerr << "\ttMaxAltitude: " << getAltitude(incidentRay(tMax)) << std::endl;
-			//	std::cerr << "\tmiddleAltitude: " << middleAltitude << std::endl;
-			//	std::cerr << "\taltitude: " << h << std::endl;
-			//}
 			const double airDensity = getAirDensity(h);
 			assert(airDensity > 0.);
 			const double aerosolsDensity = getAerosolsDensity(h);
@@ -124,7 +111,7 @@ void Atmosphere::test()
 {
 	const Sphere sphere(1., Vec3(0.));
 
-	Image image(256, 256);
+	Image image(512, 512);
 
 	const Vec3 eye(0, 0, 3.);
 	const Vec3 at(sphere.mCenter);
@@ -143,8 +130,6 @@ void Atmosphere::test()
 			);
 
 			const Ray earthRay(mOuterRadius * r(closestSphereDepth), r.mDirection);
-			//std::cerr << "ray origin: " << r(closestSphereDepth) << std::endl;
-			//std::cerr << "ray direction: " << r.mDirection << std::endl;
 
 			return singleScatteredLight(earthRay);
 		};
