@@ -2,7 +2,7 @@ CC = g++
 WFLAGS = -Wpedantic -Wall -Wextra
 #CFLAGS = -std=c++17 -g -ggdb $(WFLAGS)
 #CFLAGS = -std=c++17 -O3 -g $(WFLAGS) -DNDEBUG -fopenmp
-CFLAGS = -std=c++17 -O3 -DNDEBUG
+CFLAGS = -std=c++17 -O3 -DNDEBUG -fopenmp
 IFLAGS =
 LFLAGS = -lm
 

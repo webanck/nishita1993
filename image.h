@@ -52,6 +52,7 @@ struct Image
 
 	void computeFromFunction(const std::function<tColor(const uint, const uint)>& fun)
 	{
+		#pragma omp parallel for schedule(dynamic, 1) collapse(2)
 		for(uint col = 0u; col < mWidth; col++)
 		for(uint row = 0u; row < mHeight; row++)
 			operator()(col, row) = fun(col, row);
