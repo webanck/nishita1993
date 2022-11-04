@@ -49,3 +49,8 @@
 
 - Copy of the repository on GitHub, and description.
 - Use of OpenMP for multithreaded rendering.
+
+# 04/11/2022
+8h45-9h
+
+- A bit more info in the README.
