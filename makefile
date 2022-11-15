@@ -1,8 +1,9 @@
 CC = g++
 WFLAGS = -Wpedantic -Wall -Wextra
+PFLAGS = -g -pg
 #CFLAGS = -std=c++17 -g -ggdb $(WFLAGS)
-#CFLAGS = -std=c++17 -O3 -g $(WFLAGS) -DNDEBUG -fopenmp
-CFLAGS = -std=c++17 -O3 -DNDEBUG -fopenmp
+CFLAGS = -std=c++17 -O3 $(PFLAGS) $(WFLAGS) -DNDEBUG -fopenmp
+#CFLAGS = -std=c++17 -O3 -DNDEBUG $(WFLAGS) -fopenmp
 IFLAGS =
 LFLAGS = -lm
 
@@ -28,7 +29,12 @@ main: main.o $(OBJECTS)
 run: main
 	./main
 
+gmon.out: run
+
+profile: gmon.out
+	gprof main $^ > profile.txt
+
 clean:
-	rm -rf $(PROGRAMS) *.o *.d
+	rm -rf $(PROGRAMS) *.o *.d gmon.out profile.txt
 
 .PHONY: all run clean
