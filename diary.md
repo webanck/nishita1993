@@ -54,3 +54,26 @@
 8h45-9h
 
 - A bit more info in the README.
+
+# 15/11/2022
+13h-14h
+
+- Ray-marching at a step of around 10km instead of a tenth of the ray length.
+- Compilation parameters for profiling.
+
+# 17/11/2022
+22h-23h
+
+- Profiling with `gprof` estimates exclusive computation time at :
+  - 60% in `getSunOpticalDepth`,
+  - 14% in `singleScatteredLight`,
+  - and only 5% in `Sphere::intersectionDepths`.
+  However, the former percentages probably include computations from inlined functions such as `getAirDensity`, `getAerosolsDensity` and `getAltitude`.
+  Indeed, they don't appear in the report even though they should be the most called functions.
+- Adding `__attribute__ ((noinline))` in front of a function prototype avoids it from being inlined.
+  Doing so for `getAirDensity`, `getAerosolsDensity` and `getAltitude`, `gprof` exclusive computation times become :
+  - 38% in `getSunOpticalDepth`,
+  - 26% in `singleScatteredLight`,
+  - 10% in `getAltitude`,
+  - 6% in `getAirDensity` and `getAerosolsDensity` each,
+  - and only 3% in `Sphere::intersectionDepths` and `Sphere::intersectionDepth` each.

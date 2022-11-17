@@ -22,13 +22,15 @@ struct Atmosphere
 	static const Vec3 mSunLightDirection;
 
 
+	Atmosphere() = delete;
+
 	static Vec3 singleScatteredLight(const Ray& incidentRay);
 
 	static double rayleighPhase(const double scatteringAngleCos)
 	{
 		assert(scatteringAngleCos >= -1. && scatteringAngleCos <= 1.);
 		return 0.25*3.*(1. + sqr(scatteringAngleCos));
-	}
+}
 	static double cornettePhase(const double scatteringAngleCos)
 	{
 		assert(scatteringAngleCos >= -1. && scatteringAngleCos <= 1.);
@@ -41,17 +43,17 @@ struct Atmosphere
 		return 1.5*(1. - g*g)*(1. + sqr(scatteringAngleCos)) / ((2. + g*g)*pow(1. + g*g - 2.*g*scatteringAngleCos, 1.5));
 	}
 
-	static double getAltitude(const Vec3& p)
+	__attribute__ ((noinline)) static double getAltitude(const Vec3& p)
 	{
 		return p.length() - mInnerRadius;
 	}
-	static double getAirDensity(const double altitude)
+	__attribute__ ((noinline)) static double getAirDensity(const double altitude)
 	{
 		static const double atmosphereHeight = mOuterRadius - mInnerRadius;
 		if(altitude < 0. || altitude > atmosphereHeight) return 0.;
 		return std::exp(-altitude/mAirDensityScaleHeight);
 	}
-	static double getAerosolsDensity(const double altitude)
+	__attribute__ ((noinline)) static double getAerosolsDensity(const double altitude)
 	{
 		static const double atmosphereHeight = mOuterRadius - mInnerRadius;
 		if(altitude < 0. || altitude > atmosphereHeight) return 0.;

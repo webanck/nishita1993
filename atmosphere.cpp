@@ -136,6 +136,6 @@ void Atmosphere::test()
 			return singleScatteredLight(earthRay);
 		};
 
-	while(true) image.computeFromFunction(sphereDepthFun);
+	image.computeFromFunction(sphereDepthFun);
 	image.saveAsPPM("atmosphere_test.ppm");
 }
