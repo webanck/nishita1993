@@ -33,9 +33,10 @@ Vec3 Atmosphere::singleScatteredLight(const Ray& incidentRay)
 
 	//Coarse ray marching
 	{
+		static constexpr double baseStepSize = 10000.;
 		const double l = tMax - tMin;
 		assert(l > 0.);
-		const uint iMax = 10u;
+		const uint iMax = (l + baseStepSize)/baseStepSize; //rounded up (>= 1)
 		const double stepSize = l/iMax;
 
 		Vec3 opticalDepth(0, 0, 0);
@@ -83,8 +84,9 @@ Vec3 Atmosphere::getSunOpticalDepth(const Vec3& p)
 	assert(optMaxDepth);
 
 	//Coarse ray marching
+	static constexpr double baseStepSize = 10000.;
 	const double l = *optMaxDepth;
-	const uint iMax = 10u;
+	const uint iMax = (l + baseStepSize)/baseStepSize; //rounded up (>= 1)
 	const double stepSize = l/iMax;
 
 	double airDensitySum = 0.;
@@ -134,6 +136,6 @@ void Atmosphere::test()
 			return singleScatteredLight(earthRay);
 		};
 
-	image.computeFromFunction(sphereDepthFun);
+	while(true) image.computeFromFunction(sphereDepthFun);
 	image.saveAsPPM("atmosphere_test.ppm");
 }
