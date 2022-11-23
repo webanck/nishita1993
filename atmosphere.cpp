@@ -4,6 +4,7 @@
 #include "image.h"
 #include "sphere.h"
 
+const double Atmosphere::mAlbedoAir = 0.25/pi; //eqs 1 and 3 in Nishita1993
 const Vec3 Atmosphere::mAttenuationAirRGB = 1.e-6 * Vec3(3.8, 13.5, 33.1);
 const Vec3 Atmosphere::mSunLightIntensityRGB = 10./255.*Vec3(255, 240, 233); //RGB approximation of 5800 Kelvin degrees light
 const Vec3 Atmosphere::mSunLightDirection = -Vec3(1.).normalized();

@@ -5,7 +5,7 @@
 #include <optional>
 
 #include "maths.h"
-class Ray;
+struct Ray;
 #include "vec3.h"
 
 struct Sphere

@@ -4,7 +4,7 @@
 #include <cmath>
 #include <limits>
 
-constexpr double pi = std::acos(-1.);
+const double pi = std::acos(-1.);
 constexpr double infinity = std::numeric_limits<double>::infinity();
 
 using std::min;
