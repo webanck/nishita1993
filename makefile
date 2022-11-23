@@ -1,6 +1,7 @@
 CC = g++
 WFLAGS = -Wpedantic -Wall -Wextra
-PFLAGS = -g -pg
+#PFLAGS = -g -pg
+PFLAGS = -g -static
 #CFLAGS = -std=c++17 -g -ggdb $(WFLAGS)
 CFLAGS = -std=c++17 -O3 $(PFLAGS) $(WFLAGS) -DNDEBUG -fopenmp
 #CFLAGS = -std=c++17 -O3 -DNDEBUG $(WFLAGS) -fopenmp
@@ -30,11 +31,15 @@ run: main
 	./main
 
 gmon.out: run
+gprof: gmon.out
+	gprof main $^
 
-profile: gmon.out
-	gprof main $^ > profile.txt
+perf.data: main
+	perf record -e cycles ./$^
+perf: perf.data
+	perf report --stdio
 
 clean:
-	rm -rf $(PROGRAMS) *.o *.d gmon.out profile.txt
+	rm -rf $(PROGRAMS) *.o *.d gmon.out perf.data
 
 .PHONY: all run clean
