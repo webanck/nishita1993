@@ -77,3 +77,25 @@
   - 10% in `getAltitude`,
   - 6% in `getAirDensity` and `getAerosolsDensity` each,
   - and only 3% in `Sphere::intersectionDepths` and `Sphere::intersectionDepth` each.
+
+# 23/11/2022
+17h30-18h30, 22h-23h30
+
+- Profiling with `perf` strangely reports a lot of calls to `__nss_database_lookup2` in `libc-2.31.so`.
+  It seems the executable doesn't get linked to the shared libraries with debug symbols, even though they are available on my OS.
+  Compiling with `-static` circumvent this issue.
+- Profiling with `perf` shows 64% of the cycles in `__mcount_internal`.
+  This function is linked to profiling counters, the feature enabled by the `-pg` compiling option.
+  Because `perf` doesn't need that option, I'm getting rid of it.
+- Profiling with `perf` now puts the cycles distribution to:
+  - 32% in `_int_free`,
+  - 22% in `malloc`,
+  - 10% in `free`,
+  - 7% in `__ieee754_exp_fma`,
+  - and then 6% in `Atmosphere::getSunOpticalDepth` and 5% in `Atmosphere::getAltitude`.
+  I guess those allocations related calls are done by `std::valarray`.
+- I replaced `std::valarray` by `std::array`.
+  Profiling with `perf`, cycles are now:
+  - 34% in `__ieee754_exp_fma`,
+  - 21% in `Atmosphere::getAltitude`,
+  - and 10% in `Atmosphere::getSunOpticalDepth`.
